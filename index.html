@@ -6,7 +6,26 @@
 <title>Facilitador de Apresentações – Cohab Minas</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
+    (function(){
+  let l=document.getElementById('fav');
+  if(!l){l=document.createElement('link');l.id='fav';l.rel='icon';l.type='image/png';document.head.appendChild(l)}
+  const t=setInterval(()=>{
+    if(!IMG[2])return;
+    clearInterval(t);
+    const im=new Image();
+    im.onload=()=>{
+      const S=128,cv=document.createElement('canvas');cv.width=cv.height=S;
+      const g=cv.getContext('2d'),p=10,k=Math.min((S-2*p)/im.width,(S-2*p)/im.height),w=im.width*k,h=im.height*k;
+      g.fillStyle='#fff';
+      g.beginPath();g.roundRect?g.roundRect(0,0,S,S,24):g.rect(0,0,S,S);g.fill();
+      g.drawImage(im,(S-w)/2,(S-h)/2,w,h);
+      l.href=cv.toDataURL('image/png');
+    };
+    im.src=IMG[2];
+  },150);
+})();
+</script>
 <style>
 :root{color-scheme:light;--red:#C14523;--red2:#A53A1C;--ink:#494949;--mut:#8a8582;--bg:#F5F2F0;--card:#fff;--line:#e8e2df;--sh:0 10px 30px rgba(73,73,73,.10);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}
@@ -327,6 +346,25 @@ toast('✓ Apresentação gerada! Abra no PowerPoint para editar.')}catch(err){t
 b.innerHTML=old;b.disabled=false}
 (async()=>{steps();pane();$('#sl').innerHTML='<div class="sl"></div>';
 try{const z=await JSZip.loadAsync(TPL,{base64:true});for(const n of [1,2,3])IMG[n]='data:image/png;base64,'+await z.file(`ppt/media/image${n}.png`).async('base64');$('#hl').src=IMG[2];render()}catch(e){toast('Não foi possível carregar o modelo. Verifique a conexão.')}})();
+(function(){
+  let l=document.getElementById('fav');
+  if(!l){l=document.createElement('link');l.id='fav';l.rel='icon';l.type='image/png';document.head.appendChild(l)}
+  const t=setInterval(()=>{
+    if(!IMG[2])return;
+    clearInterval(t);
+    const im=new Image();
+    im.onload=()=>{
+      /* recorta so o hexagono (lado esquerdo do logo: ~755 de 2835 px) */
+      const sw=Math.round(im.width*755/2835),sh=im.height,S=128,cv=document.createElement('canvas');cv.width=cv.height=S;
+      const g=cv.getContext('2d'),p=6,k=Math.min((S-2*p)/sw,(S-2*p)/sh),w=sw*k,h=sh*k;
+      g.fillStyle='#fff';
+      g.beginPath();g.roundRect?g.roundRect(0,0,S,S,24):g.rect(0,0,S,S);g.fill();
+      g.drawImage(im,0,0,sw,sh,(S-w)/2,(S-h)/2,w,h);
+      l.href=cv.toDataURL('image/png');
+    };
+    im.src=IMG[2];
+  },150);
+})();
 </script>
 </body>
 </html>
