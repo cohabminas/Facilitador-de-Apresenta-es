@@ -118,6 +118,12 @@ header:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;backg
 .note b{display:block;font-size:16px;color:var(--red);margin-bottom:4px}.note p{margin:0 0 8px;font-size:13.5px;color:var(--ink);line-height:1.5}.note p:last-child{margin:0}
 .ph{background:#F5F2F0;border:1px solid #D9D3D0;border-radius:calc(var(--pt)*8);display:grid;place-items:center;padding:calc(var(--pt)*6)}.ph0{display:grid;place-items:center}.ph img,.ph0 img{max-width:100%;max-height:100%;object-fit:contain;display:block}.ph img{border-radius:calc(var(--pt)*3)}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+.fx-sl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);overflow:hidden;container-type:inline-size;font-family:Calibri,Carlito,Arial,sans-serif;line-height:1.2;color:#000}
+.fx-sl *{box-sizing:border-box}.fx-e{position:absolute}.fx-e>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.fx-tx{position:absolute;inset:0;display:flex;flex-direction:column;word-wrap:break-word}
+.fx-tb{width:100%;height:100%;border-collapse:collapse;table-layout:fixed}.fx-tb td{overflow:hidden}.fx-tc{position:static;display:block;padding:0!important}
+.fx-miss{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border:1px dashed #b9b2ae;color:#6b6663;font-size:calc(var(--pt)*11);text-align:center;background:rgba(245,242,240,.6)}
+.fx-tg{margin-left:auto;font:inherit;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;border:1px solid var(--red);background:#fff;color:var(--red);cursor:pointer}
 </style>
 </head>
 <body>
@@ -249,18 +255,20 @@ out.push({ti,tx,tb,im})}
 let T=f.name.replace(/\.pptx$/i,''),a=0,e=out.length;const k0=out.findIndex(o=>o.ti||o.tx.length||o.tb||o.im);
 if(k0>=0){const f0=out[k0];if(f0.ti&&!f0.tb&&!f0.im&&f0.tx.length<=2){T=f0.ti;a=k0+1}else a=k0}
 const l=out[e-1];if(e>a+1&&/obrigad|agrade|perguntas|fim\b/i.test(l.ti+' '+l.tx.map(x=>x.t).join(' '))&&l.tx.length<=3&&!l.tb&&!l.im)e--;
-const cs=[];for(const o of out.slice(a,e).slice(0,60)){if(!o.ti&&!o.tx.length&&!o.tb&&!o.im)continue;let m=null;
+const cs=[];for(const [oi,o] of out.slice(a,e).slice(0,60).entries()){if(!o.ti&&!o.tx.length&&!o.tb&&!o.im)continue;let m=null;
 if(o.tb&&o.tb.length)m={k:'tbl',rows:o.tb,raw:''};else if(o.im){try{const bs=await z.file(o.im).async('uint8array'),x=o.im.split('.').pop().toLowerCase();m={k:'img',p:40,...await shrink(new Blob([bs],{type:'image/'+x}))}}catch(er){}}
-cs.push({id:nid++,a:o.ti.replace(/^Tema\s*\d+\s*:?\s*/i,'').slice(0,75),b:o.tx.filter(x=>x.t!==T).map(x=>(x.b?'- ':'')+x.t).join('\n'),m})}
+cs.push({fxi:a+oi,id:nid++,a:o.ti.replace(/^Tema\s*\d+\s*:?\s*/i,'').slice(0,75),b:o.tx.filter(x=>x.t!==T).map(x=>(x.b?'- ':'')+x.t).join('\n'),m})}
 if(!cs.length)return toast('Não encontrei conteúdo nesse arquivo.');
+try{if(window.FXPPTX)await FXPPTX.load(z)}catch(er){console.warn('FXPPTX',er)}
 S.t=T.slice(0,110);S.c=cs;S.cur=1;save();pane();render();toast(`✓ ${cs.length} slides importados e convertidos para o padrão Cohab.`)}
 const tFit=n=>Math.max(18,Math.min(32,Math.floor(800/(n*.52)))),fFit=n=>Math.max(9,Math.min(14,Math.floor(741/(Math.max(n,1)*.5))));
 function cFit(t){for(let z=40;z>=20;z-=2){const cpl=308/(z*.53);let l=1,c=0;t.split(/\s+/).forEach(w=>{if(!c)c=w.length;else if(c+1+w.length<=cpl)c+=1+w.length;else{l++;c=w.length}if(w.length>cpl)l+=Math.floor(w.length/cpl)});if(l*z*1.1<=205)return z}return 20}
 const fz=z=>`font-size:calc(var(--pt)*${z})`;
 function pv(i){const k=deck()[i];
 if(k.k==='o')return`<img style="left:31.7%;top:40.26%;width:36.75%" src="${IMG[1]}">`;
-if(k.k==='t'){const t=S.t.trim();return`<div style="left:59.03%;top:0;width:40.97%;height:100%;background:#C14523"></div><img style="left:11.86%;top:40.72%;width:35.45%" src="${IMG[2]}"><div class="t" style="left:62.9%;top:40.79%;width:33.63%;height:40.29%;color:#fff;font-weight:700;${fz(cFit(t||'Título da apresentação'))};${t?'':'opacity:.55'}"><span>${esc(t||'Título da apresentação')}</span></div>`}
+if(k.k==='t'){const t=S.t.trim();return`<div style="left:59.03%;top:0;width:40.97%;height:100%;background:#C14523"></div><img style="left:11.86%;top:40.72%;width:35.45%" src="${IMG[2]}"><div class="t" style="left:62.9%;top:29.92%;width:33.63%;height:40.29%;color:#fff;font-weight:700;${fz(cFit(t||'Título da apresentação'))};${t?'':'opacity:.55'}"><span>${esc(t||'Título da apresentação')}</span></div>`}
 if(k.k==='e')return`<div style="inset:0;background:#C14523"></div><img style="left:23.64%;top:40.52%;width:28.89%" src="${IMG[3]}"><div style="left:55.13%;top:43.8%;height:12.41%;border-left:calc(var(--pt)*1.75) solid #fff;border-radius:9px"></div><div class="t" style="left:57.72%;top:42.67%;width:19.18%;height:14.67%;color:#fff;font-weight:700;${fz(36)}"><span>Agradeço a<br>atenção</span></div>`;
+if(window.FXPPTX&&FXPPTX.on&&k.c.fxi!=null&&FXPPTX.has(k.c.fxi))return FXPPTX.html(k.c.fxi);
 const a=k.c.a.trim(),ps=parse(k.c.b),L=lay(k.c),f=bFit(ps,L.t.w,L.t.h),z=tFit(a.length+9),ft=S.t.trim()||'Título da apresentação';
 let h='',ul=0;ps.forEach(p=>{if(p.b){if(!ul){h+='<ul>';ul=1}h+=`<li>${esc(p.t)}</li>`}else{if(ul){h+='</ul>';ul=0}h+=`<p>${p.t?esc(p.t):'&nbsp;'}</p>`}});if(ul)h+='</ul>';
 return`<div style="left:5.8%;top:9.8%;height:5%;border-left:calc(var(--pt)*2.5) solid #C14523"></div><div class="t" style="left:6.875%;top:10.03%;width:86.25%;height:4.81%;${fz(z)};color:#494949"><span><b style="color:#C14523">Tema ${pad(k.n+1)}${a?': ':''}</b>${esc(a)}</span></div><div class="b" style="${pc(L.t.x,L.t.y,L.t.w,L.t.h)};${fz(f.z)};${ps.length?'':'opacity:.4'}">${h||'<p>Texto do slide…</p>'}</div><div style="left:3.51%;top:90.76%;width:79.43%;height:4.28%;background:#C14523;border-radius:calc(var(--pt)*8)"></div><div class="t" style="left:3.51%;top:90.76%;width:78.6%;height:4.28%;justify-content:flex-end;color:#fff;${fz(fFit(ft.length))}"><span>${esc(ft)}</span></div><img style="left:83.92%;top:89.14%;width:14.27%" src="${IMG[2]}">${att(k.c,L)}`}
@@ -324,7 +332,7 @@ const bd=q.bd||[],b=hs?[ln('lnL',bd[3]),ln('lnR',bd[1]),ln('lnT',bd[0]),ln('lnB'
 return`<a:tc${at}><a:txBody><a:bodyPr/><a:lstStyle/><a:p><a:pPr algn="${AL[q.a||'l']}"/>${vv?`<a:r><a:rPr lang="pt-BR" sz="${f.z*100}"${bold?' b="1"':''}${hs&&q.i?' i="1"':''} dirty="0"><a:solidFill>${clr}</a:solidFill><a:latin typeface="Calibri"/><a:cs typeface="Calibri"/></a:rPr><a:t>${esc(vv)}</a:t></a:r>`:`<a:endParaRPr lang="pt-BR" sz="${f.z*100}"/>`}</a:p></a:txBody><a:tcPr marL="91440" marR="91440" marT="36000" marB="36000" anchor="ctr">${b}<a:solidFill>${fill}</a:solidFill></a:tcPr></a:tc>`};
 return`<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id="21" name="Tabela"/><p:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></p:cNvGraphicFramePr><p:nvPr/></p:nvGraphicFramePr><p:xfrm><a:off x="${Math.round(L.a.x)}" y="${Math.round(L.a.y)}"/><a:ext cx="${BW}" cy="${Math.round(L.a.h)}"/></p:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/table"><a:tbl><a:tblPr firstRow="1" bandRow="1"/><a:tblGrid>${f.cw.map(w=>`<a:gridCol w="${Math.round(w)}"/>`).join('')}</a:tblGrid>${m.rows.map((r,i)=>`<a:tr h="${Math.round(f.rh[i])}">${Array.from({length:nc},(_,j)=>cell(r[j]||'',i,j)).join('')}</a:tr>`).join('')}</a:tbl></a:graphicData></a:graphic></p:graphicFrame>`+(L.a.n?notesX(L.a.n,m.notes):'')};
 const T=S.t.trim(),s3=await rd('ppt/slides/slide3.xml'),r3=await rd('ppt/slides/_rels/slide3.xml.rels');
-zip.file('ppt/slides/slide2.xml',edit(await rd('ppt/slides/slide2.xml'),(sp,ph)=>{if(ph&&ph.getAttribute('type')=='title')setP(sp,`<a:p>${run(T,cFit(T),BG,1)}</a:p>`)}));
+zip.file('ppt/slides/slide2.xml',edit(await rd('ppt/slides/slide2.xml'),(sp,ph)=>{if(ph&&ph.getAttribute('type')=='title'){const o=sp.getElementsByTagName('a:off')[0];if(o)o.setAttribute('y','2051924');setP(sp,`<a:p>${run(T,cFit(T),BG,1)}</a:p>`)}}));
 ['3','4'].forEach(n=>{zip.remove(`ppt/slides/slide${n}.xml`);zip.remove(`ppt/slides/_rels/slide${n}.xml.rels`)});
 let ct=(await rd('[Content_Types].xml')).replace(/<Override PartName="\/ppt\/slides\/slide[34]\.xml"[^>]*\/>/g,''),pr=(await rd('ppt/_rels/presentation.xml.rels')).replace(/<Relationship Id="rId[45]"[^>]*\/>/g,''),ids='<p:sldId id="256" r:id="rId2"/><p:sldId id="257" r:id="rId3"/>',ro='',co='',usedJ=0;
 S.c.forEach((c,i)=>{const a=c.a.trim(),ps=parse(c.b),L=lay(c),f=bFit(ps,L.t.w,L.t.h),z=tFit(a.length+9),nm=10+i,rl=c.m&&c.m.k=='img'&&L.a?r3.replace('</Relationships>',`<Relationship Id="rId20" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/up${i}.${c.m.t}"/></Relationships>`):r3;
@@ -364,6 +372,293 @@ try{const z=await JSZip.loadAsync(TPL,{base64:true});for(const n of [1,2,3])IMG[
     };
     im.src=IMG[2];
   },150);
+})();
+</script>
+<script>
+/* ==========================================================================
+   FXPPTX — leitura e renderização fiel de PPTX (módulo isolado, v1)
+   Usa apenas JSZip/DOMParser já presentes. Não altera o fluxo Cohab:
+   - FXPPTX.load(zip): lê o arquivo e pré-renderiza cada slide (HTML/SVG)
+   - FXPPTX.has(i) / FXPPTX.html(i): usados por pv() para o modo "Original"
+   Cobre: herança layout/master/tema, texto formatado, formas preset e
+   personalizadas, linhas/conectores, grupos, imagens (recorte), tabelas,
+   gráficos (barra/coluna/linha/área/pizza/rosca, combinados) e SmartArt
+   (via desenho pré-renderizado). O que não for suportado vira um marcador.
+   ========================================================================== */
+(()=>{'use strict';
+const $c=(n,t)=>n?[...n.children].find(c=>c.localName==t)||null:null,
+$$=(n,t)=>n?[...n.children].filter(c=>c.localName==t):[],
+qq=(n,t)=>n?n.getElementsByTagNameNS('*',t)[0]||null:null,
+at=(n,k,d)=>n&&n.hasAttribute(k)?n.getAttribute(k):d,
+nu=(n,k,d=0)=>n&&n.hasAttribute(k)?+n.getAttribute(k):d,
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+DP=new DOMParser();
+let X=null,gid=0;
+
+/* ---------- cores (tema, lumMod/lumOff/tint/shade/alpha) ---------- */
+const r2h=(r,g,b)=>{r/=255;g/=255;b/=255;const M=Math.max(r,g,b),m=Math.min(r,g,b),l=(M+m)/2;let h=0,s=0;if(M!=m){const d=M-m;s=l>.5?d/(2-M-m):d/(M+m);h=M==r?(g-b)/d+(g<b?6:0):M==g?(b-r)/d+2:(r-g)/d+4;h/=6}return[h,s,l]};
+const h2r=(h,s,l)=>{if(!s)return[l,l,l].map(v=>v*255);const f=(p,q,t)=>{t<0&&(t+=1);t>1&&(t-=1);return t<1/6?p+(q-p)*6*t:t<.5?q:t<2/3?p+(q-p)*(2/3-t)*6:p},q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;return[f(p,q,h+1/3),f(p,q,h),f(p,q,h-1/3)].map(v=>v*255)};
+function col(n){const c=n&&[...n.children].find(x=>/Clr$/.test(x.localName));if(!c)return null;
+ const v=c.getAttribute('val');let h;
+ switch(c.localName){case'srgbClr':h=v;break;case'sysClr':h=at(c,'lastClr','000000');break;case'schemeClr':h=X.th[X.cm[v]||v]||'000000';break;default:h=({white:'FFFFFF',black:'000000'})[v]||'000000'}
+ let C=[0,2,4].map(i=>parseInt(h.substr(i,2),16)),a=1;
+ for(const m of c.children){const x=nu(m,'val')/1e5,k=m.localName;
+  if(k=='alpha')a=x;else if(k=='tint')C=C.map(v=>v*x+255*(1-x));else if(k=='shade')C=C.map(v=>v*x);
+  else if(k=='lumMod'||k=='lumOff'||k=='satMod'){const H=r2h(...C);if(k=='lumMod')H[2]*=x;else if(k=='lumOff')H[2]+=x;else H[1]*=x;H[2]=Math.min(1,Math.max(0,H[2]));H[1]=Math.min(1,H[1]);C=h2r(...H)}}
+ C=C.map(v=>Math.round(Math.max(0,Math.min(255,v))));
+ return a<1?`rgba(${C},${a})`:'#'+C.map(v=>v.toString(16).padStart(2,'0')).join('')}
+function paint(sp,defs){const f=sp&&[...sp.children].find(c=>/^(noFill|solidFill|gradFill|pattFill)$/.test(c.localName));if(!f)return null;
+ if(f.localName=='noFill')return'none';if(f.localName=='solidFill')return col(f);if(f.localName=='pattFill')return col($c(f,'fgClr'));
+ const st=$$($c(f,'gsLst'),'gs');if(!st.length)return null;
+ const id='fxg'+(++gid),lin=$c(f,'lin'),r=(lin?nu(lin,'ang')/6e4:90)*Math.PI/180,dx=Math.cos(r)/2,dy=Math.sin(r)/2;
+ defs.push(`<linearGradient id="${id}" x1="${.5-dx}" y1="${.5-dy}" x2="${.5+dx}" y2="${.5+dy}">${st.map(g=>`<stop offset="${nu(g,'pos')/1e3}%" stop-color="${col(g)}"/>`).join('')}</linearGradient>`);return`url(#${id})`}
+
+/* ---------- unidades ---------- */
+const PT=e=>e/12700,
+P=pt=>`calc(var(--pt)*${(pt*X.K).toFixed(3)})`,
+pe=e=>P(PT(e)),pc=(v,t)=>(v/t*100).toFixed(4)+'%';
+
+/* ---------- geometrias preset ---------- */
+const pl=a=>'M'+a.map(x=>x.join(',')).join('L')+'Z';
+function GP(p,w,h,v){const s=Math.min(w,h),A=(k,d)=>v[k]!=null?v[k]:d;
+ switch(p){
+ case'ellipse':case'flowChartConnector':return`M0,${h/2}A${w/2},${h/2} 0 1 1 ${w},${h/2}A${w/2},${h/2} 0 1 1 0,${h/2}Z`;
+ case'roundRect':case'flowChartAlternateProcess':case'flowChartTerminator':{const r=s*(p=='flowChartTerminator'?.5:Math.min(A('adj',16667),5e4)/1e5);return`M${r},0H${w-r}A${r},${r} 0 0 1 ${w},${r}V${h-r}A${r},${r} 0 0 1 ${w-r},${h}H${r}A${r},${r} 0 0 1 0,${h-r}V${r}A${r},${r} 0 0 1 ${r},0Z`}
+ case'triangle':return pl([[0,h],[w*A('adj',5e4)/1e5,0],[w,h]]);
+ case'rtTriangle':return pl([[0,0],[0,h],[w,h]]);
+ case'diamond':case'flowChartDecision':return pl([[w/2,0],[w,h/2],[w/2,h],[0,h/2]]);
+ case'parallelogram':{const o=s*A('adj',25e3)/1e5;return pl([[o,0],[w,0],[w-o,h],[0,h]])}
+ case'trapezoid':{const o=s*A('adj',25e3)/1e5;return pl([[0,h],[o,0],[w-o,0],[w,h]])}
+ case'hexagon':{const o=s*A('adj',25e3)/1e5;return pl([[0,h/2],[o,0],[w-o,0],[w,h/2],[w-o,h],[o,h]])}
+ case'pentagon':return pl([[w/2,0],[w,h*.38],[w*.81,h],[w*.19,h],[0,h*.38]]);
+ case'octagon':{const o=s*A('adj',29289)/1e5;return pl([[o,0],[w-o,0],[w,o],[w,h-o],[w-o,h],[o,h],[0,h-o],[0,o]])}
+ case'chevron':{const o=s*A('adj',5e4)/1e5;return pl([[0,0],[w-o,0],[w,h/2],[w-o,h],[0,h],[o,h/2]])}
+ case'homePlate':{const o=s*A('adj',5e4)/1e5;return pl([[0,0],[w-o,0],[w,h/2],[w-o,h],[0,h]])}
+ case'plus':{const o=s*A('adj',25e3)/1e5;return pl([[o,0],[w-o,0],[w-o,o],[w,o],[w,h-o],[w-o,h-o],[w-o,h],[o,h],[o,h-o],[0,h-o],[0,o],[o,o]])}
+ case'rightArrow':{const t=h*A('adj1',5e4)/1e5,hd=Math.min(s*A('adj2',5e4)/1e5,w),y=(h-t)/2;return pl([[0,y],[w-hd,y],[w-hd,0],[w,h/2],[w-hd,h],[w-hd,y+t],[0,y+t]])}
+ case'star5':{const a=[];for(let i=0;i<10;i++){const r=i%2?.382:1,g=-Math.PI/2+i*Math.PI/5;a.push([w/2+Math.cos(g)*r*w/2,h/2+Math.sin(g)*r*h/2])}return pl(a)}
+ default:X.unk.add(p);return`M0,0H${w}V${h}H0Z`}}
+function geo(p,w,h,v){const R=(q,W,H,tf)=>({d:GP(q,W,H,v),tf});
+ if(p=='leftArrow')return R('rightArrow',w,h,`translate(${w},0) scale(-1,1)`);
+ if(p=='upArrow')return R('rightArrow',h,w,`translate(0,${h}) rotate(-90)`);
+ if(p=='downArrow')return R('rightArrow',h,w,`translate(${w},0) rotate(90)`);
+ return{d:GP(p,w,h,v),tf:''}}
+function cust(g,w,h){let d='';for(const p of $$($c(g,'pathLst'),'path')){const pw=nu(p,'w',w)||w,ph=nu(p,'h',h)||h,sx=w/pw,sy=h/ph,
+ pt=n=>{const e=$c(n,'pt');return`${nu(e,'x')*sx},${nu(e,'y')*sy}`};
+ for(const c of p.children){const k=c.localName;
+  if(k=='moveTo')d+='M'+pt(c);else if(k=='lnTo')d+='L'+pt(c);
+  else if(k=='cubicBezTo')d+='C'+$$(c,'pt').map(e=>`${nu(e,'x')*sx},${nu(e,'y')*sy}`).join(' ');
+  else if(k=='quadBezTo')d+='Q'+$$(c,'pt').map(e=>`${nu(e,'x')*sx},${nu(e,'y')*sy}`).join(' ');
+  else if(k=='close')d+='Z'}}return d}
+const connPath=(p,w,h,v)=>{const a=(v.adj1!=null?v.adj1:5e4)/1e5;
+ if(/^bentConnector2/.test(p))return`M0,0H${w}V${h}`;if(/^bentConnector/.test(p))return`M0,0H${w*a}V${h}H${w}`;
+ if(p=='curvedConnector2')return`M0,0C${w/2},0 ${w},${h/2} ${w},${h}`;if(/^curvedConnector/.test(p))return`M0,0C${w*a},0 ${w*a},${h} ${w},${h}`;
+ return`M0,0L${w},${h}`};
+
+/* ---------- traço (linha, tracejado, setas) ---------- */
+function stroke(spPr,st,defs){const ln=$c(spPr,'ln'),nf=ln&&$c(ln,'noFill');let c=null,w=nu(ln,'w',0);
+ if(ln&&!nf)c=paint(ln,defs);
+ if(!c&&!nf&&st){const lr=$c(st,'lnRef'),i=nu(lr,'idx');if(lr&&i>0){c=col(lr);if(!w)w=[0,9525,19050,38100][Math.min(3,i)]}}
+ if(!c||c=='none')return'stroke="none"';if(!w)w=12700;
+ const DS={dash:[4,3],sysDash:[3,1],dot:[1,1],sysDot:[1,1],lgDash:[8,3],dashDot:[4,3,1,3],lgDashDot:[8,3,1,3]}[at($c(ln,'prstDash'),'val','')];
+ const mk=(e,pos)=>{const t=at(e,'type','none');if(!e||t=='none')return'';const m='fxm'+(++gid),sz=({sm:2,med:3,lg:4})[at(e,'w','med')]||3;
+  defs.push(`<marker id="${m}" viewBox="0 0 10 10" refX="${t=='oval'?5:9}" refY="5" markerWidth="${sz}" markerHeight="${sz}" orient="auto-start-reverse"><path d="${t=='oval'?'M5,0A5,5 0 1 1 5,10A5,5 0 1 1 5,0Z':t=='diamond'?'M5,0L10,5L5,10L0,5Z':'M0,0L10,5L0,10Z'}" fill="${c}"/></marker>`);return`marker-${pos}="url(#${m})"`};
+ return`stroke="${c}" stroke-width="${w}" stroke-linejoin="round" ${DS?`stroke-dasharray="${DS.map(x=>x*w).join(' ')}"`:''} ${mk($c(ln,'headEnd'),'start')} ${mk($c(ln,'tailEnd'),'end')}`}
+
+/* ---------- texto ---------- */
+function textBox(tb,lists,bps,dc,fs,tbl,force){if(!tb)return null;
+ const ps=$$(tb,'p');if(!ps.some(p=>[...p.children].some(c=>/^(r|fld|br)$/.test(c.localName)&&(c.localName=='br'||(qq(c,'t')||{}).textContent)))&&!tbl)return null;
+ const out=[];let num=0;
+ for(const p of ps){const pp=$c(p,'pPr'),lv=nu(pp,'lvl',0),ch=lists.map(l=>$c(l,'lvl'+(lv+1)+'pPr')).filter(Boolean),PA=[pp,...ch].filter(Boolean),
+  ga=k=>{const n=PA.find(x=>x.hasAttribute(k));return n?n.getAttribute(k):null},gc=t=>{for(const n of PA){const c=$c(n,t);if(c)return c}return null},
+  dr=ch.map(n=>$c(n,'defRPr')).filter(Boolean),
+  RP=r=>[r&&$c(r,'rPr'),...dr].filter(Boolean),
+  size=rp=>{const n=rp.find(x=>x.hasAttribute('sz'));return(n?+n.getAttribute('sz')/100:18)*fs},
+  fam=rp=>{const l=rp.map(x=>$c(x,'latin')).find(Boolean),t=l&&l.getAttribute('typeface');return t==='+mj-lt'?X.fj:t==='+mn-lt'||!t?X.fn:t};
+  const runs=[...p.children].filter(c=>/^(r|br|fld)$/.test(c.localName));
+  const html=runs.map(r=>{if(r.localName=='br')return'<br>';const rp=RP(r),t=(qq(r,'t')||{}).textContent||'',s=[`font-size:${P(size(rp))}`,`font-family:'${fam(rp)}',Calibri,Carlito,Arial,sans-serif`],
+   f=k=>{const n=rp.find(x=>x.hasAttribute(k));return n?n.getAttribute(k):null},cf=(force?[$c(r,'rPr')].filter(Boolean):rp).map(x=>$c(x,'solidFill')).find(Boolean);
+   s.push('color:'+(cf?col(cf):dc));if(f('b')=='1')s.push('font-weight:700');if(f('i')=='1')s.push('font-style:italic');
+   const u=f('u'),sk=f('strike');if((u&&u!='none')||(sk&&sk!='noStrike'))s.push('text-decoration:'+[u&&u!='none'?'underline':'',sk&&sk!='noStrike'?'line-through':''].join(' '));
+   if(f('cap')=='all')s.push('text-transform:uppercase');const bl=+(f('baseline')||0);if(bl)s.push(`vertical-align:${bl>0?'super':'sub'};font-size:${P(size(rp)*.7)}`);
+   const sp=+(f('spc')||0);if(sp)s.push(`letter-spacing:${P(sp/100)}`);
+   return`<span style="${s.join(';')}">${esc(t)}</span>`}).join('')||`<span style="font-size:${P(size(RP($c(p,'endParaRPr'))))}">&nbsp;</span>`;
+  const mL=+(ga('marL')||0),ind=+(ga('indent')||0),al={l:'left',ctr:'center',r:'right',just:'justify'}[ga('algn')]||'left',s=[`text-align:${al}`];
+  let bu=null;for(const n of PA){const x=[...n.children].find(c=>/^bu(None|Char|AutoNum|Blip)$/.test(c.localName));if(x){bu=x;break}}
+  const ln=gc('lnSpc'),lp=ln&&$c(ln,'spcPct'),lt=ln&&$c(ln,'spcPts'),fz=size(RP(runs[0]||null)),
+  sb=gc('spcBef'),sa=gc('spcAft'),spv=n=>{if(!n)return 0;const a=$c(n,'spcPts'),b=$c(n,'spcPct');return a?nu(a,'val')/100:b?nu(b,'val')/1e5*fz*1.2:0};
+  s.push(`line-height:${lt?P(nu(lt,'val')/100):lp?(nu(lp,'val')/1e5*1.2).toFixed(3):1.2}`,`margin-top:${P(spv(sb))}`,`margin-bottom:${P(spv(sa))}`);
+  let pre='';
+  if(bu&&bu.localName!='buNone'&&bu.localName!='buBlip'){const w=Math.max(-ind,fz*12700*.8);
+   const ch2=bu.localName=='buChar'?bu.getAttribute('char'):(++num)+'.';if(bu.localName=='buChar')num=0;
+   const bc=gc('buClr');pre=`<span style="display:inline-block;width:${pe(w)};text-indent:0;${bc?'color:'+col(bc):''}">${esc(ch2)}</span>`;
+   s.push(`margin-left:${pe(Math.max(mL,w))}`,`text-indent:${pe(-w)}`)}
+  else{num=0;s.push(`margin-left:${pe(mL)}`,`text-indent:${pe(ind)}`)}
+  out.push(`<div style="${s.join(';')}">${pre}${html}</div>`)}
+ const gb=k=>{const n=bps.find(x=>x&&x.hasAttribute(k));return n?n.getAttribute(k):null},
+ an=({t:'flex-start',ctr:'center',b:'flex-end'})[gb('anchor')||'t'],
+ ins=['tIns','rIns','bIns','lIns'].map((k,i)=>pe(gb(k)!=null?+gb(k):[45720,91440,45720,91440][i])).join(' ');
+ const vert=gb('vert');
+ return`<div class="fx-tx" style="justify-content:${an};padding:${ins};${gb('wrap')=='none'?'white-space:nowrap;':''}${vert&&/^vert/.test(vert)?'writing-mode:vertical-rl;'+(vert=='vert270'?'transform:rotate(180deg);':''):''}">${out.join('')}</div>`}
+
+/* ---------- herança de placeholders ---------- */
+const nt=t=>t==='ctrTitle'?'title':t||'body';
+function findPh(tree,ph){if(!tree||!ph)return null;const ty=nt(at(ph,'type')),ix=at(ph,'idx');let best=null;
+ for(const s of tree.children){const nv=$c(s,'nvSpPr'),p=nv&&qq(nv,'ph');if(!p)continue;
+  if(ix!=null&&at(p,'idx')===ix&&(nt(at(p,'type'))==ty||ty=='body'))return s;
+  if(nt(at(p,'type'))==ty&&(!best||(at(p,'idx')==null)))best=s}return best}
+
+/* ---------- construtores de elementos ---------- */
+const box=(T,xf,C)=>{const o=$c(xf,'off'),e=$c(xf,'ext');if(!e)return null;
+ const x=T.ax+nu(o,'x')*T.sx,y=T.ay+nu(o,'y')*T.sy,w=nu(e,'cx')*T.sx,h=nu(e,'cy')*T.sy;return{x,y,w,h,rot:nu(xf,'rot')/6e4,fh:at(xf,'flipH')=='1',fv:at(xf,'flipV')=='1'}};
+const wrap=(b,inner,extra='')=>`<div class="fx-e" style="left:${pc(b.x,X.W)};top:${pc(b.y,X.H)};width:${pc(b.w,X.W)};height:${pc(b.h,X.H)};${b.rot?`transform:rotate(${b.rot}deg);`:''}${extra}">${inner}</div>`;
+
+function shapeEl(n,T,C,out){const k=n.localName,nv=$c(n,'nvSpPr')||$c(n,'nvCxnSpPr'),cn=nv&&qq(nv,'cNvPr');if(cn&&at(cn,'hidden')=='1')return;
+ const ph=nv&&qq(nv,'ph'),spPr=$c(n,'spPr'),st=$c(n,'style');
+ const lph=ph&&findPh(C.lay&&C.lay.tree,ph),mph=ph&&findPh(X.mtree,ph),chain=[n,lph,mph].filter(Boolean);
+ let xf=$c(spPr,'xfrm');if(!xf)for(const s of chain){xf=$c($c(s,'spPr'),'xfrm');if(xf)break}
+ if(!xf&&k=='sp'&&!$c(n,'txBody'))return;const b=xf&&box(T,xf,C);if(!b)return;
+ const defs=[];let svg='';
+ const prst=$c(spPr,'prstGeom'),cg=$c(spPr,'custGeom'),av={};
+ if(prst)$$($c(prst,'avLst'),'gd').forEach(g=>{const m=/val\s+(-?\d+)/.exec(at(g,'fmla',''));if(m)av[g.getAttribute('name')]=+m[1]});
+ const isC=/^(line|straightConnector1|bentConnector\d|curvedConnector\d)$/.test(at(prst,'prst',''))||k=='cxnSp';
+ let d='',tf='';
+ if(cg)d=cust(cg,b.w,b.h);else if(prst){if(isC)d=connPath(at(prst,'prst'),b.w,b.h,av);else({d,tf}=geo(at(prst,'prst'),b.w,b.h,av))}
+ if(d){let fl=null;for(const s of chain){fl=paint($c(s,'spPr'),defs);if(fl)break}
+  if(!fl&&st&&!isC){const fr=$c(st,'fillRef');if(nu(fr,'idx')>0)fl=col(fr)}
+  let sa=stroke(spPr||$c(lph,'spPr'),st,defs);if(sa=='stroke="none"'&&!spPr)sa=stroke($c(mph,'spPr'),st,defs);
+  svg=`<svg viewBox="0 0 ${b.w} ${b.h}" preserveAspectRatio="none" style="transform:scale(${b.fh?-1:1},${b.fv?-1:1})"><defs>${defs.join('')}</defs><path d="${d}" ${tf?`transform="${tf}"`:''} fill="${isC?'none':fl||'none'}" ${sa}/></svg>`}
+ const lists=[$c($c(n,'txBody'),'lstStyle'),lph&&$c($c(lph,'txBody'),'lstStyle'),mph&&$c($c(mph,'txBody'),'lstStyle'),
+  X.txs[ph?(nt(at(ph,'type'))=='title'?'titleStyle':'bodyStyle'):'otherStyle'],X.dts].filter(Boolean),
+ bps=[qq($c(n,'txBody'),'bodyPr'),lph&&qq($c(lph,'txBody'),'bodyPr'),mph&&qq($c(mph,'txBody'),'bodyPr')],
+ fr=st&&$c(st,'fontRef'),dc=(fr&&col(fr))||(X.th.dk1?'#'+X.th.dk1:'#000'),
+ bp=bps[0],af=bp&&$c(bp,'normAutofit'),fs=af?nu(af,'fontScale',1e5)/1e5:1,
+ tx=textBox($c(n,'txBody'),lists,bps,dc,fs,false,!ph&&!!(fr&&col(fr)));
+ if(!svg&&!tx)return;out.push(wrap(b,svg+(tx||'')))}
+
+function picEl(n,T,C,out){return(async()=>{const nv=$c(n,'nvPicPr'),cn=nv&&qq(nv,'cNvPr');if(cn&&at(cn,'hidden')=='1')return;
+ const spPr=$c(n,'spPr'),b=box(T,$c(spPr,'xfrm'),C),bl=qq($c(n,'blipFill'),'blip');if(!b||!bl)return;
+ const r=C.rels[bl.getAttribute('r:embed')];if(!r)return;const u=await media(r.t);
+ if(!u){out.push(wrap(b,`<div class="fx-miss">Imagem não suportada (${esc(r.t.split('.').pop())})</div>`));return}
+ const sr=qq($c(n,'blipFill'),'srcRect'),l=nu(sr,'l')/1e3,t=nu(sr,'t')/1e3,rr=nu(sr,'r')/1e3,bb=nu(sr,'b')/1e3,
+ W=100-l-rr||100,H=100-t-bb||100,g=at($c(spPr,'prstGeom'),'prst',''),ln=$c(spPr,'ln'),lc=ln&&paint(ln,[]);
+ const sty=`${g=='ellipse'?'border-radius:50%;':/roundRect/.test(g)?'border-radius:8%;':''}${lc&&lc!='none'?`border:${pe(nu(ln,'w',12700))} solid ${lc};`:''}overflow:hidden;`;
+ out.push(wrap(b,`<div style="position:absolute;inset:0;${sty}"><img src="${u}" style="position:absolute;left:${-l/W*100}%;top:${-t/H*100}%;width:${1e4/W}%;height:${1e4/H}%;transform:scale(${b.fh?-1:1},${b.fv?-1:1});object-fit:fill" alt=""></div>`))})()}
+
+async function media(p){if(X.media[p]!==undefined)return X.media[p];const ext=p.split('.').pop().toLowerCase(),m={png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',gif:'image/gif',webp:'image/webp',bmp:'image/bmp',svg:'image/svg+xml'}[ext];
+ const f=X.z.file(p);return X.media[p]=m&&f?`data:${m};base64,`+await f.async('base64'):null}
+
+function tableEl(n,T,b,C,out){const tbl=qq(n,'tbl');if(!tbl)return;const gr=$$($c(tbl,'tblGrid'),'gridCol').map(g=>nu(g,'w')),tw=gr.reduce((a,c)=>a+c,0)||1,
+ pr=$c(tbl,'tblPr'),fr=at(pr,'firstRow')=='1',bd=at(pr,'bandRow')=='1',rows=$$(tbl,'tr'),th=rows.reduce((a,r)=>a+nu(r,'h'),0)||1,ac='#'+(X.th.accent1||'4472C4'),acs=[],
+ lt=X.dts?[X.dts]:[];let h=`<table class="fx-tb"><colgroup>${gr.map(w=>`<col style="width:${(w/tw*100).toFixed(3)}%">`).join('')}</colgroup>`;
+ rows.forEach((r,ri)=>{h+=`<tr style="height:${(nu(r,'h')/th*100).toFixed(3)}%">`;
+  $$(r,'tc').forEach(c=>{if(at(c,'hMerge')=='1'||at(c,'vMerge')=='1')return;const tp=$c(c,'tcPr'),defs=[],hd=fr&&ri==0;let bg=paint(tp,defs);
+   const s=[];if(!bg&&hd)bg=ac;else if(!bg&&bd&&ri%2)bg='rgba(' +parseInt(ac.substr(1,2),16)+','+parseInt(ac.substr(3,2),16)+','+parseInt(ac.substr(5,2),16)+',.18)';
+   if(bg&&bg!='none'&&!/^url/.test(bg))s.push('background:'+bg);
+   for(const [k,cs] of [['lnL','left'],['lnR','right'],['lnT','top'],['lnB','bottom']]){const l=$c(tp,k);if(l&&!$c(l,'noFill')){const c2=paint(l,[]);if(c2)s.push(`border-${cs}:${pe(nu(l,'w',12700))} solid ${c2}`)}else if(!l&&bg&&bg!='none')s.push(`border-${cs}:${pe(12700)} solid #fff`)}
+   s.push('vertical-align:'+({ctr:'middle',b:'bottom'}[at(tp,'anchor','')]||'top'),`padding:${pe(nu(tp,'marT',45720))} ${pe(nu(tp,'marR',91440))} ${pe(nu(tp,'marB',45720))} ${pe(nu(tp,'marL',91440))}`);
+   const t=textBox($c(c,'txBody'),lt,[],hd?'#fff':'#'+(X.th.dk1||'000000'),1,true,true);
+   h+=`<td colspan="${nu(c,'gridSpan',1)}" rowspan="${nu(c,'rowSpan',1)}" style="${s.join(';')}">${(t||'').replace('class="fx-tx" style="','class="fx-tc" style="'+(hd?'font-weight:700;':''))}</td>`});h+='</tr>'});
+ out.push(wrap(b,h+'</table>'))}
+
+/* ---------- gráficos ---------- */
+const ACC=['accent1','accent2','accent3','accent4','accent5','accent6'];
+const cache=n=>{if(!n)return[];const c=qq(n,'strCache')||qq(n,'numCache');if(!c)return[];const N=nu($c(c,'ptCount'),'val',0),a=Array(N).fill('');$$(c,'pt').forEach(p=>a[+p.getAttribute('idx')]=qq(p,'v').textContent);return a};
+async function chartSvg(path,w,h){const d=X.z.file(path)&&DP.parseFromString(await X.z.file(path).async('string'),'application/xml'),pa=qq(d,'plotArea');if(!pa)return null;
+ const kinds=[...pa.children].filter(c=>/Chart$/.test(c.localName));if(!kinds.length)return null;
+ const ok=/^(bar|bar3D|line|line3D|area|area3D|pie|pie3D|doughnut)Chart$/;if(!kinds.some(k=>ok.test(k.localName)))return{miss:kinds[0].localName};
+ const dfl=[],cl=i=>'#'+X.th[ACC[i%6]];
+ const mk=(ck,ti)=>$$(ck,'ser').map((s,i)=>{const nm=cache($c(s,'tx'))[0]||'',cats=cache($c(s,'cat')),vals=cache($c(s,'val')).map(v=>+v||0),
+  c=paint($c(s,'spPr'),dfl)||cl(ti+i),dp={};$$(s,'dPt').forEach(p=>{dp[nu($c(p,'idx'),'val')]=paint($c(p,'spPr'),dfl)});return{nm,cats,vals,c,dp}});
+ const groups=kinds.filter(k=>ok.test(k.localName)).map(k=>({k,ty:k.localName.replace('3D','').replace('Chart',''),gp:at($c(k,'grouping'),'val','clustered'),dir:at($c(k,'barDir'),'val','col'),gw:nu($c(k,'gapWidth'),'val',150)/100,s:mk(k,0)}));
+ let ti=qq($c(qq(d,'chart'),'title'),'rich');ti=ti?[...ti.getElementsByTagNameNS('*','t')].map(t=>t.textContent).join(''):'';
+ const lg=!!$c(qq(d,'chart'),'legend'),T=ti?26:8,Bt=lg?22:6;let o=`<text x="${w/2}" y="17" font-size="14" text-anchor="middle" fill="#595959">${esc(ti)}</text>`;
+ const tx=(x,y,s,a='middle',z=10)=>`<text x="${x}" y="${y}" font-size="${z}" text-anchor="${a}" fill="#595959">${esc(s)}</text>`;
+ const g0=groups[0],leg=[];
+ if(/^(pie|doughnut)$/.test(g0.ty)){const s=g0.s[0],tot=s.vals.reduce((a,c)=>a+Math.max(0,c),0)||1,r=Math.min(w,h-T-Bt)/2-6,cx=w/2,cy=T+(h-T-Bt)/2,hr=g0.ty=='doughnut'?nu($c(g0.k,'holeSize'),'val',50)/100*r:0;let a0=-Math.PI/2;
+  const sp=g0.ty=='pie'&&at(qq(g0.k,'showPercent'),'val')=='1';
+  s.vals.forEach((v,i)=>{if(v<=0)return;const a1=a0+v/tot*2*Math.PI,P2=(rr,a)=>`${cx+Math.cos(a)*rr},${cy+Math.sin(a)*rr}`,lf=a1-a0>Math.PI?1:0,c=s.dp[i]||cl(i);
+   o+=`<path d="M${P2(r,a0)}A${r},${r} 0 ${lf} 1 ${P2(r,a1)}${hr?`L${P2(hr,a1)}A${hr},${hr} 0 ${lf} 0 ${P2(hr,a0)}Z`:`L${cx},${cy}Z`}" fill="${c}" stroke="#fff" stroke-width="1"/>`;
+   if(sp)o+=tx(cx+Math.cos((a0+a1)/2)*r*.65,cy+Math.sin((a0+a1)/2)*r*.65+4,Math.round(v/tot*100)+'%','middle',11).replace('#595959','#fff');a0=a1;leg.push([s.cats[i]||'',s.dp[i]||cl(i)])})}
+ else{const ncat=Math.max(...groups.flatMap(g=>g.s.map(s=>s.vals.length)),1),cats=(groups[0].s[0]||{cats:[]}).cats,hz=g0.dir=='bar'&&g0.ty=='bar';
+  let mx=0,mn=0;for(const g of groups){const st=/stacked/i.test(g.gp);for(let i=0;i<ncat;i++){let p=0,n=0;g.s.forEach(s=>{const v=s.vals[i]||0;if(st){v>=0?p+=v:n+=v}else{mx=Math.max(mx,v);mn=Math.min(mn,v)}});if(st){mx=Math.max(mx,/percent/i.test(g.gp)?1:p);mn=Math.min(mn,n)}}}
+  const pct=groups.some(g=>/percent/i.test(g.gp)),rg=(mx-mn)||1,step=(()=>{const m=rg/5,p=10**Math.floor(Math.log10(m)),f=m/p;return(f<=1?1:f<=2?2:f<=5?5:10)*p})(),vmax=Math.ceil(mx/step)*step,vmin=Math.floor(mn/step)*step,
+  L=hz?60:38,R=10,pw=w-L-R,ph=h-T-Bt-(hz?4:18),x0=L,y0=T,fm=v=>pct?Math.round(v*100)+'%':(+v.toFixed(2)).toLocaleString('pt-BR'),
+  vy=v=>y0+ph-(v-vmin)/(vmax-vmin)*ph,vx=v=>x0+(v-vmin)/(vmax-vmin)*pw;
+  for(let v=vmin;v<=vmax+1e-9;v+=step){if(hz){o+=`<line x1="${vx(v)}" y1="${y0}" x2="${vx(v)}" y2="${y0+ph}" stroke="#d9d9d9"/>`+tx(vx(v),y0+ph+13,fm(v))}else{o+=`<line x1="${x0}" y1="${vy(v)}" x2="${x0+pw}" y2="${vy(v)}" stroke="#d9d9d9"/>`+tx(x0-5,vy(v)+3.5,fm(v),'end')}}
+  const band=(hz?ph:pw)/ncat;
+  for(let i=0;i<ncat;i++){const c=(cats[i]||'').slice(0,18);o+=hz?tx(x0-5,y0+ph-(i+.5)*band+3.5,c,'end'):tx(x0+(i+.5)*band,y0+ph+14,c)}
+  for(const g of groups){const st=/stacked/i.test(g.gp),m=g.s.length;
+   if(g.ty=='bar'){const bw=band/(1+g.gw)/(st?1:m),pad=(band-bw*(st?1:m))/2;
+    for(let i=0;i<ncat;i++){let p=0,n=0;const sum=g.s.reduce((a,s)=>a+Math.abs(s.vals[i]||0),0)||1;
+     g.s.forEach((s,j)=>{let v=s.vals[i]||0;if(/percent/i.test(g.gp))v=v/sum;let a,b2;if(st){a=v>=0?p:n;b2=a+v;v>=0?p=b2:n=b2}else{a=0;b2=v}
+      const k=st?0:j;let rx,ry,rw,rh;if(hz){rh=bw;ry=y0+ph-i*band-pad-(k+1)*bw;rx=vx(Math.min(a,b2));rw=Math.abs(vx(b2)-vx(a))}else{rw=bw;rx=x0+i*band+pad+k*bw;ry=vy(Math.max(a,b2));rh=Math.abs(vy(b2)-vy(a))}
+      o+=`<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" fill="${s.dp[i]||s.c}"/>`})}}
+   else{const cum=Array(ncat).fill(0);g.s.forEach(s=>{const pts=s.vals.map((v,i)=>{const y=st?(cum[i]+=v):v;return[x0+(i+.5)*band,vy(y)]});
+    if(g.ty=='area')o+=`<path d="M${pts[0]?pts[0][0]:0},${vy(Math.max(0,vmin))}L${pts.map(p=>p.join(',')).join('L')}L${pts.length?pts[pts.length-1][0]:0},${vy(Math.max(0,vmin))}Z" fill="${s.c}" fill-opacity=".75"/>`;
+    else{o+=`<path d="M${pts.map(p=>p.join(',')).join('L')}" fill="none" stroke="${s.c}" stroke-width="2.25" stroke-linejoin="round"/>`;if(at(qq(g.k,'symbol'),'val','')!='none')pts.forEach(p=>o+=`<circle cx="${p[0]}" cy="${p[1]}" r="3" fill="${s.c}"/>`)}})}}
+  o+=`<line x1="${x0}" y1="${y0+ph}" x2="${x0+pw}" y2="${y0+ph}" stroke="#bfbfbf"/>`;
+  groups.forEach(g=>g.s.forEach(s=>leg.push([s.nm,s.c])))}
+ if(lg&&leg.length){let x=10;const y=h-8;o+=leg.map(([n,c])=>{const s=`<rect x="${x}" y="${y-8}" width="9" height="9" fill="${c}"/>${tx(x+13,y,n,'start')}`;x+=26+String(n).length*5.2;return s}).join('')}
+ return{svg:`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="font-family:'${X.fn}',Calibri,Carlito,Arial,sans-serif"><defs>${dfl.join('')}</defs>${o}</svg>`}}
+
+async function frameEl(n,T,C,out){const xf=$c(n,'xfrm'),b=box(T,xf,C);if(!b)return;const gd=qq(n,'graphicData'),uri=at(gd,'uri','');
+ if(/table/.test(uri))return tableEl(n,T,b,C,out);
+ if(/chart/.test(uri)){const ce=qq(gd,'chart'),r=ce&&C.rels[ce.getAttribute('r:id')];if(!r)return;
+  try{const c=await chartSvg(r.t,PT(b.w),PT(b.h));if(c&&c.svg)out.push(wrap(b,c.svg));else out.push(wrap(b,`<div class="fx-miss">Gráfico${c&&c.miss?' ('+esc(c.miss)+')':''} — tipo ainda não renderizado</div>`))}catch(e){out.push(wrap(b,'<div class="fx-miss">Gráfico não pôde ser lido</div>'))}return}
+ if(/diagram/.test(uri)){const dr=Object.values(C.rels).find(r=>/diagramDrawing$/.test(r.ty));
+  if(dr&&X.z.file(dr.t)){const dd=DP.parseFromString(await X.z.file(dr.t).async('string'),'application/xml'),tr=qq(dd,'spTree'),
+   T2={ax:b.x,ay:b.y,sx:T.sx,sy:T.sy},C2={rels:await rels(dr.t),lay:C.lay};if(tr)return walk(tr,T2,C2,out)}
+  out.push(wrap(b,'<div class="fx-miss">Diagrama (SmartArt) sem desenho salvo</div>'))}}
+
+async function walk(tree,T,C,out,o={}){for(const n of tree.children){const k=n.localName;
+ try{if(k=='AlternateContent'){const f=$c(n,'Fallback')||$c(n,'Choice');if(f)await walk(f,T,C,out,o)}
+ else if(k=='grpSp'){const xf=$c($c(n,'grpSpPr'),'xfrm'),o1=$c(xf,'off'),e1=$c(xf,'ext'),co=$c(xf,'chOff'),ce=$c(xf,'chExt');if(!e1||!ce){await walk(n,T,C,out,o);continue}
+  const ax=T.ax+nu(o1,'x')*T.sx,ay=T.ay+nu(o1,'y')*T.sy,sx=nu(e1,'cx')*T.sx/(nu(ce,'cx')||1),sy=nu(e1,'cy')*T.sy/(nu(ce,'cy')||1);
+  await walk(n,{ax:ax-nu(co,'x')*sx,ay:ay-nu(co,'y')*sy,sx,sy},C,out,o)}
+ else if(k=='sp'||k=='cxnSp'){if(o.skipPh&&qq($c(n,'nvSpPr')||n,'ph'))continue;shapeEl(n,T,C,out)}
+ else if(k=='pic')await picEl(n,T,C,out);
+ else if(k=='graphicFrame')await frameEl(n,T,C,out)}catch(e){X.err.push(k+': '+e.message)}}}
+
+/* ---------- pacote ---------- */
+const nz=(base,t)=>{if(t[0]=='/')return t.slice(1);const p=base.split('/');p.pop();for(const s of t.split('/')){if(s=='..')p.pop();else if(s!='.')p.push(s)}return p.join('/')};
+const rd=async p=>X.z.file(p)?DP.parseFromString(await X.z.file(p).async('string'),'application/xml'):null;
+async function rels(p){const dir=p.replace(/[^/]*$/,''),d=await rd(dir+'_rels/'+p.slice(dir.length)+'.rels'),m={};
+ if(d)for(const r of d.getElementsByTagName('Relationship'))if(r.getAttribute('TargetMode')!='External')m[r.getAttribute('Id')]={t:nz(p,r.getAttribute('Target')),ty:r.getAttribute('Type')};return m}
+async function bgOf(root,C){const bg=qq(root,'bg');if(!bg)return null;const bp=$c(bg,'bgPr'),defs=[];
+ if(bp){const bf=$c(bp,'blipFill');if(bf){const bl=qq(bf,'blip'),r=bl&&C.rels[bl.getAttribute('r:embed')],u=r&&await media(r.t);return u?`background:url(${u}) center/cover`:null}
+  const f=paint(bp,defs);if(f&&/^url/.test(f)){const gs=$$($c($c(bp,'gradFill'),'gsLst'),'gs').map(g=>col(g));return`background:linear-gradient(${gs.join(',')})`}return f&&f!='none'?'background:'+f:null}
+ const br=$c(bg,'bgRef'),c=br&&col(br);return c?'background:'+c:null}
+
+async function load(z){X={z,media:{},unk:new Set(),err:[],th:{},cm:{},txs:{},slides:[]};
+ const pr=await rd('ppt/presentation.xml'),sz=qq(pr,'sldSz');X.W=nu(sz,'cx',12192000);X.H=nu(sz,'cy',6858000);X.K=960/(X.W/12700);X.dts=qq(pr,'defaultTextStyle');
+ const pm=await rels('ppt/presentation.xml'),ids=[...pr.getElementsByTagNameNS('*','sldId')].map(s=>pm[s.getAttribute('r:id')]).filter(Boolean).map(r=>r.t);
+ const cache2={};
+ for(const sp of ids){try{
+  const sd=await rd(sp),sr=await rels(sp),lr=Object.values(sr).find(r=>/slideLayout$/.test(r.ty));
+  if(!lr){X.slides.push(null);continue}
+  const ld=await rd(lr.t),lrel=await rels(lr.t),mr=Object.values(lrel).find(r=>/slideMaster$/.test(r.ty)),md=await rd(mr.t),mrel=await rels(mr.t);
+  if(!cache2[mr.t]){const tr=Object.values(mrel).find(r=>/theme$/.test(r.ty)),td=tr&&await rd(tr.t);X.th={};
+   const cs=qq(td,'clrScheme');if(cs)for(const c of cs.children){const e=c.firstElementChild;X.th[c.localName]=e?(e.localName=='sysClr'?at(e,'lastClr','000000'):at(e,'val','000000')):'000000'}
+   const fs=qq(td,'fontScheme');X.fj=at(qq($c(fs,'majorFont'),'latin'),'typeface','Calibri');X.fn=at(qq($c(fs,'minorFont'),'latin'),'typeface','Calibri');
+   const cm=qq(md,'clrMap');X.cm={};if(cm)for(const a of cm.attributes)X.cm[a.name]=a.value;
+   const ts=qq(md,'txStyles');X.txs={};if(ts)for(const c of ts.children)X.txs[c.localName]=c;
+   X.mtree=qq(md,'spTree');cache2[mr.t]={th:X.th,cm:X.cm,txs:X.txs,mtree:X.mtree,fj:X.fj,fn:X.fn}}
+  else Object.assign(X,cache2[mr.t]);
+  const lo=qq(ld,'cSld'),so=qq(sd,'cSld'),Cm={rels:mrel},Cl={rels:lrel,tree:qq(ld,'spTree')},Cs={rels:sr,lay:Cl},I={ax:0,ay:0,sx:1,sy:1},out=[];
+  const bg=(await bgOf(so,Cs))||(await bgOf(lo,Cl))||(await bgOf(qq(md,'cSld'),Cm))||'background:#fff';
+  if(at(sd.documentElement,'showMasterSp','1')!='0'&&at(ld.documentElement,'showMasterSp','1')!='0')await walk(X.mtree,I,Cm,out,{skipPh:true});
+  if(at(sd.documentElement,'showMasterSp','1')!='0')await walk(Cl.tree,I,Cl,out,{skipPh:true});
+  await walk(qq(sd,'spTree'),I,Cs,out);
+  const r=X.W/X.H,fit=r>=16/9?`width:100%;aspect-ratio:${X.W}/${X.H}`:`height:100%;width:${(r/(16/9)*100).toFixed(3)}%;aspect-ratio:${X.W}/${X.H}`;
+  X.slides.push(`<div class="fx-sl" style="${fit};${bg}">${out.join('')}</div>`)}catch(e){X.err.push('slide: '+e.message);X.slides.push(null)}}
+ FX.d=X;if(X.unk.size||X.err.length)console.info('[FXPPTX] formas sem preset:',[...X.unk],'erros:',X.err);mount()}
+
+function mount(){const h=document.querySelector('.pt2');if(!h||document.getElementById('fxtg'))return;
+ const b=document.createElement('button');b.id='fxtg';b.type='button';b.className='fx-tg';b.title='Alternar entre o visual original do PowerPoint e o padrão Cohab';
+ const lab=()=>b.textContent=FX.on?'Original ✓':'Padrão Cohab';lab();b.onclick=()=>{FX.on=!FX.on;lab();if(window.render)render()};h.appendChild(b)}
+
+const FX=window.FXPPTX={on:true,d:null,load,has:i=>!!(FX.d&&FX.d.slides[i]),html:i=>FX.d.slides[i]};
 })();
 </script>
 </body>
